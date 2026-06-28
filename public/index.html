@@ -9,9 +9,16 @@
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <div>
-          <p class="eyebrow">MT Mission Game</p>
-          <h1>파파라치 마니또</h1>
+        <div class="brand-row">
+          <div>
+            <p class="eyebrow">MT Mission Game</p>
+            <h1>파파라치 마니또</h1>
+          </div>
+          <button class="menu-toggle top-admin-menu hidden" id="adminMenuButton" type="button" aria-expanded="false" aria-controls="adminMenu" aria-label="관리자 메뉴">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
         </div>
         <div class="mode-switch" role="tablist" aria-label="모드 선택">
           <button class="active" id="participantMode" type="button">참가자</button>
@@ -82,14 +89,6 @@
           </section>
 
           <div class="admin-dashboard hidden" id="adminDashboard">
-            <div class="admin-mobile-bar">
-              <span id="adminCurrentMenu">참가자 명단</span>
-              <button class="menu-toggle" id="adminMenuButton" type="button" aria-expanded="false" aria-controls="adminMenu">
-                <span></span>
-                <span></span>
-                <span></span>
-              </button>
-            </div>
             <nav class="admin-menu" id="adminMenu" aria-label="관리자 메뉴">
               <button class="active" type="button" data-admin-tab="roster">참가자 명단</button>
               <button type="button" data-admin-tab="submissions">서브 미션</button>

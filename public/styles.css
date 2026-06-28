@@ -52,6 +52,14 @@ button {
   padding: 18px 0 24px;
 }
 
+.brand-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   color: var(--accent);
@@ -123,10 +131,6 @@ h2 {
 .admin-menu button.active {
   background: var(--primary);
   color: white;
-}
-
-.admin-mobile-bar {
-  display: none;
 }
 
 .view {
@@ -239,6 +243,12 @@ input[type="file"] {
   gap: 4px;
   background: var(--ink);
   padding: 0;
+}
+
+.top-admin-menu {
+  display: none;
+  flex: 0 0 auto;
+  margin-top: 2px;
 }
 
 .menu-toggle span {
@@ -537,6 +547,7 @@ input[type="file"] {
   .topbar {
     align-items: stretch;
     flex-direction: column;
+    position: relative;
   }
 
   .mode-switch {
@@ -561,21 +572,19 @@ input[type="file"] {
     grid-template-columns: 1fr;
   }
 
-  .admin-mobile-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: rgba(255, 253, 250, 0.9);
-    padding: 8px 8px 8px 14px;
-    font-weight: 900;
+  .top-admin-menu:not(.hidden) {
+    display: inline-grid;
   }
 
   .admin-menu {
     display: none;
-    grid-template-columns: 1fr 1fr;
+    position: absolute;
+    top: 74px;
+    right: 14px;
+    z-index: 12;
+    width: min(280px, calc(100vw - 28px));
+    grid-template-columns: 1fr;
+    box-shadow: 0 18px 50px rgba(29, 36, 40, 0.22);
   }
 
   .admin-menu.open {

@@ -11,13 +11,6 @@ const state = {
   slideTimer: null
 };
 
-const adminTabLabels = {
-  roster: "참가자 명단",
-  submissions: "서브 미션",
-  winners: "우승자 선정",
-  slideshow: "Submission 슬라이드 쇼"
-};
-
 const $ = (id) => document.getElementById(id);
 
 function toast(message) {
@@ -40,10 +33,12 @@ async function api(path, options = {}) {
 
 function setMode(mode) {
   state.mode = mode;
+  state.adminMenuOpen = false;
   $("participantMode").classList.toggle("active", mode === "participant");
   $("adminMode").classList.toggle("active", mode === "admin");
   $("participantView").classList.toggle("active", mode === "participant");
   $("adminView").classList.toggle("active", mode === "admin");
+  renderAdminMenuButton();
 }
 
 function optionList(items, selected = "", placeholder = "선택 안 함") {
@@ -169,6 +164,7 @@ async function adminLogin() {
   await loadAdminState();
   $("adminLoginPanel").classList.add("hidden");
   $("adminDashboard").classList.remove("hidden");
+  renderAdminMenuButton();
   toast("관리자 화면을 열었습니다.");
 }
 
@@ -204,7 +200,6 @@ function setAdminTab(tab) {
 }
 
 function renderAdminTab() {
-  $("adminCurrentMenu").textContent = adminTabLabels[state.adminTab];
   $("adminMenu").classList.toggle("open", state.adminMenuOpen);
   $("adminMenuButton").setAttribute("aria-expanded", String(state.adminMenuOpen));
   document.querySelectorAll("[data-admin-tab]").forEach((button) => {
@@ -213,6 +208,15 @@ function renderAdminTab() {
   document.querySelectorAll("[data-admin-section]").forEach((section) => {
     section.classList.toggle("active", section.dataset.adminSection === state.adminTab);
   });
+}
+
+function renderAdminMenuButton() {
+  const showMenu = state.mode === "admin" && state.adminPassword && !$("adminDashboard").classList.contains("hidden");
+  $("adminMenuButton").classList.toggle("hidden", !showMenu);
+  if (!showMenu) {
+    state.adminMenuOpen = false;
+    $("adminMenu")?.classList.remove("open");
+  }
 }
 
 function toggleAdminMenu() {
