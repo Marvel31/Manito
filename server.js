@@ -7,7 +7,7 @@ import multer from "multer";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dataDir = path.join(__dirname, "data");
+const dataDir = process.env.DATA_DIR || process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, "data");
 const uploadDir = path.join(dataDir, "uploads");
 const dbPath = path.join(dataDir, "db.json");
 const adminPassword = process.env.ADMIN_PASSWORD || "admin1234";
