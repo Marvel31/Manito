@@ -82,7 +82,14 @@
           </section>
 
           <div class="admin-dashboard hidden" id="adminDashboard">
-            <section class="panel">
+            <nav class="admin-menu" aria-label="관리자 메뉴">
+              <button class="active" type="button" data-admin-tab="roster">참가자 명단</button>
+              <button type="button" data-admin-tab="submissions">서브 미션</button>
+              <button type="button" data-admin-tab="winners">우승자 선정</button>
+              <button type="button" data-admin-tab="slideshow">Submission 슬라이드 쇼</button>
+            </nav>
+
+            <section class="panel admin-section active" id="adminRosterSection" data-admin-section="roster">
               <div class="panel-header">
                 <div>
                   <p class="eyebrow">Basket Notes</p>
@@ -108,7 +115,7 @@
               <div class="participant-list" id="adminParticipantList"></div>
             </section>
 
-            <section class="panel wide">
+            <section class="panel admin-section" id="adminSubmissionsSection" data-admin-section="submissions">
               <div class="panel-header">
                 <div>
                   <p class="eyebrow">Submissions</p>
@@ -119,7 +126,7 @@
               <div class="submission-grid" id="submissionGrid"></div>
             </section>
 
-            <section class="panel wide">
+            <section class="panel admin-section" id="adminWinnersSection" data-admin-section="winners">
               <h2>1, 2, 3등 선정</h2>
               <div class="ranking-grid">
                 <label>
@@ -136,6 +143,22 @@
                 </label>
               </div>
               <button class="primary" id="saveRankingButton" type="button">순위 저장</button>
+            </section>
+
+            <section class="panel admin-section slideshow-panel" id="adminSlideshowSection" data-admin-section="slideshow">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Photo Review</p>
+                  <h2>Submission 슬라이드 쇼</h2>
+                </div>
+                <span class="count-badge" id="slideCount">0 / 0</span>
+              </div>
+              <div class="slideshow-stage" id="slideshowStage"></div>
+              <div class="slideshow-controls">
+                <button class="ghost" id="prevSlideButton" type="button">이전</button>
+                <button class="secondary" id="autoSlideButton" type="button">자동 재생</button>
+                <button class="ghost" id="nextSlideButton" type="button">다음</button>
+              </div>
             </section>
           </div>
         </section>

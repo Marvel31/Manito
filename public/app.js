@@ -4,7 +4,10 @@ const state = {
   player: null,
   adminPassword: "",
   adminParticipants: [],
-  rankings: []
+  rankings: [],
+  adminTab: "roster",
+  slideIndex: 0,
+  slideTimer: null
 };
 
 const $ = (id) => document.getElementById(id);
@@ -54,6 +57,10 @@ function escapeHtml(value = "") {
 
 function nameOf(id, list = state.adminParticipants) {
   return list.find((p) => p.id === id)?.name || "미정";
+}
+
+function submittedParticipants() {
+  return state.adminParticipants.filter((p) => p.photo);
 }
 
 async function loadParticipants() {
@@ -161,6 +168,8 @@ async function loadAdminState() {
   const data = await api("/api/admin/state");
   state.adminParticipants = data.participants;
   state.rankings = data.rankings || [];
+  const submitted = submittedParticipants();
+  if (state.slideIndex >= submitted.length) state.slideIndex = Math.max(0, submitted.length - 1);
   renderAdmin();
 }
 
@@ -174,6 +183,24 @@ function renderAdmin() {
   $("rankThird").value = state.rankings.find((r) => r.rank === 3)?.participantId || "";
   renderAdminParticipants();
   renderSubmissions();
+  renderSlideshow();
+  renderAdminTab();
+}
+
+function setAdminTab(tab) {
+  state.adminTab = tab;
+  if (tab !== "slideshow") stopAutoSlide();
+  renderAdminTab();
+  if (tab === "slideshow") renderSlideshow();
+}
+
+function renderAdminTab() {
+  document.querySelectorAll("[data-admin-tab]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.adminTab === state.adminTab);
+  });
+  document.querySelectorAll("[data-admin-section]").forEach((section) => {
+    section.classList.toggle("active", section.dataset.adminSection === state.adminTab);
+  });
 }
 
 function renderAdminParticipants() {
@@ -208,6 +235,60 @@ function renderSubmissions() {
       </article>
     `;
   }).join("") || `<p class="hint">사진을 볼 참가자가 없습니다.</p>`;
+}
+
+function renderSlideshow() {
+  const slides = submittedParticipants();
+  const stage = $("slideshowStage");
+  $("slideCount").textContent = slides.length ? `${state.slideIndex + 1} / ${slides.length}` : "0 / 0";
+  $("prevSlideButton").disabled = slides.length <= 1;
+  $("nextSlideButton").disabled = slides.length <= 1;
+  $("autoSlideButton").disabled = slides.length <= 1;
+  $("autoSlideButton").textContent = state.slideTimer ? "자동 정지" : "자동 재생";
+
+  if (!slides.length) {
+    stage.innerHTML = `<div class="empty-slide">아직 제출된 사진이 없습니다.</div>`;
+    stopAutoSlide();
+    return;
+  }
+
+  const participant = slides[state.slideIndex];
+  const guess = participant.guessId ? nameOf(participant.guessId) : "아직 없음";
+  stage.innerHTML = `
+    <figure class="slide-card">
+      <img src="${participant.photo.url}" alt="${escapeHtml(participant.name)} 제출 사진" />
+      <figcaption>
+        <span class="slide-owner">${escapeHtml(participant.name)}</span>
+        <strong>${escapeHtml(participant.mission)}</strong>
+        <span>자신의 예상 마니또: ${escapeHtml(guess)}</span>
+      </figcaption>
+    </figure>
+  `;
+}
+
+function moveSlide(direction) {
+  const slides = submittedParticipants();
+  if (!slides.length) return;
+  state.slideIndex = (state.slideIndex + direction + slides.length) % slides.length;
+  renderSlideshow();
+}
+
+function stopAutoSlide() {
+  if (!state.slideTimer) return;
+  window.clearInterval(state.slideTimer);
+  state.slideTimer = null;
+  $("autoSlideButton").textContent = "자동 재생";
+}
+
+function toggleAutoSlide() {
+  if (state.slideTimer) {
+    stopAutoSlide();
+    return;
+  }
+  const slides = submittedParticipants();
+  if (slides.length <= 1) return;
+  state.slideTimer = window.setInterval(() => moveSlide(1), 4500);
+  $("autoSlideButton").textContent = "자동 정지";
 }
 
 async function saveParticipant(event) {
@@ -275,6 +356,9 @@ async function saveRankings() {
 function wireEvents() {
   $("participantMode").addEventListener("click", () => setMode("participant"));
   $("adminMode").addEventListener("click", () => setMode("admin"));
+  document.querySelectorAll("[data-admin-tab]").forEach((button) => {
+    button.addEventListener("click", () => setAdminTab(button.dataset.adminTab));
+  });
   $("participantSelect").addEventListener("change", updateLoginHint);
   $("loginButton").addEventListener("click", () => loginParticipant().catch((err) => toast(err.message)));
   $("uploadForm").addEventListener("submit", (event) => uploadPhoto(event).catch((err) => toast(err.message)));
@@ -286,6 +370,9 @@ function wireEvents() {
   $("clearFormButton").addEventListener("click", clearParticipantForm);
   $("adminParticipantList").addEventListener("click", (event) => handleParticipantAction(event).catch((err) => toast(err.message)));
   $("saveRankingButton").addEventListener("click", () => saveRankings().catch((err) => toast(err.message)));
+  $("prevSlideButton").addEventListener("click", () => moveSlide(-1));
+  $("nextSlideButton").addEventListener("click", () => moveSlide(1));
+  $("autoSlideButton").addEventListener("click", toggleAutoSlide);
 }
 
 async function restorePlayer() {
