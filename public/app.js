@@ -6,8 +6,16 @@ const state = {
   adminParticipants: [],
   rankings: [],
   adminTab: "roster",
+  adminMenuOpen: false,
   slideIndex: 0,
   slideTimer: null
+};
+
+const adminTabLabels = {
+  roster: "참가자 명단",
+  submissions: "서브 미션",
+  winners: "우승자 선정",
+  slideshow: "Submission 슬라이드 쇼"
 };
 
 const $ = (id) => document.getElementById(id);
@@ -189,18 +197,27 @@ function renderAdmin() {
 
 function setAdminTab(tab) {
   state.adminTab = tab;
+  state.adminMenuOpen = false;
   if (tab !== "slideshow") stopAutoSlide();
   renderAdminTab();
   if (tab === "slideshow") renderSlideshow();
 }
 
 function renderAdminTab() {
+  $("adminCurrentMenu").textContent = adminTabLabels[state.adminTab];
+  $("adminMenu").classList.toggle("open", state.adminMenuOpen);
+  $("adminMenuButton").setAttribute("aria-expanded", String(state.adminMenuOpen));
   document.querySelectorAll("[data-admin-tab]").forEach((button) => {
     button.classList.toggle("active", button.dataset.adminTab === state.adminTab);
   });
   document.querySelectorAll("[data-admin-section]").forEach((section) => {
     section.classList.toggle("active", section.dataset.adminSection === state.adminTab);
   });
+}
+
+function toggleAdminMenu() {
+  state.adminMenuOpen = !state.adminMenuOpen;
+  renderAdminTab();
 }
 
 function renderAdminParticipants() {
@@ -291,6 +308,20 @@ function toggleAutoSlide() {
   $("autoSlideButton").textContent = "자동 정지";
 }
 
+function openParticipantModal(participant = null) {
+  $("participantModalTitle").textContent = participant ? "참가자 수정" : "참가자 추가";
+  $("editParticipantId").value = participant?.id || "";
+  $("nameInput").value = participant?.name || "";
+  $("missionInput").value = participant?.mission || "";
+  $("participantModal").classList.remove("hidden");
+  $("nameInput").focus();
+}
+
+function closeParticipantModal() {
+  clearParticipantForm();
+  $("participantModal").classList.add("hidden");
+}
+
 async function saveParticipant(event) {
   event.preventDefault();
   const id = $("editParticipantId").value;
@@ -300,7 +331,7 @@ async function saveParticipant(event) {
   };
   const path = id ? `/api/admin/participants/${id}` : "/api/admin/participants";
   await api(path, { method: id ? "PUT" : "POST", body: JSON.stringify(body) });
-  clearParticipantForm();
+  closeParticipantModal();
   await loadAdminState();
   await loadParticipants();
   toast(id ? "참가자를 수정했습니다." : "참가자를 등록했습니다.");
@@ -319,9 +350,7 @@ async function handleParticipantAction(event) {
   const participant = state.adminParticipants.find((p) => p.id === id);
   if (!participant) return;
   if (button.dataset.action === "edit") {
-    $("editParticipantId").value = participant.id;
-    $("nameInput").value = participant.name;
-    $("missionInput").value = participant.mission;
+    openParticipantModal(participant);
     return;
   }
   if (button.dataset.action === "reset") {
@@ -356,6 +385,7 @@ async function saveRankings() {
 function wireEvents() {
   $("participantMode").addEventListener("click", () => setMode("participant"));
   $("adminMode").addEventListener("click", () => setMode("admin"));
+  $("adminMenuButton").addEventListener("click", toggleAdminMenu);
   document.querySelectorAll("[data-admin-tab]").forEach((button) => {
     button.addEventListener("click", () => setAdminTab(button.dataset.adminTab));
   });
@@ -366,8 +396,13 @@ function wireEvents() {
   $("logoutButton").addEventListener("click", logoutParticipant);
   $("adminLoginButton").addEventListener("click", () => adminLogin().catch((err) => toast(err.message)));
   $("refreshAdminButton").addEventListener("click", () => loadAdminState().catch((err) => toast(err.message)));
+  $("addParticipantButton").addEventListener("click", () => openParticipantModal());
   $("participantForm").addEventListener("submit", (event) => saveParticipant(event).catch((err) => toast(err.message)));
-  $("clearFormButton").addEventListener("click", clearParticipantForm);
+  $("clearFormButton").addEventListener("click", closeParticipantModal);
+  $("closeParticipantModalButton").addEventListener("click", closeParticipantModal);
+  $("participantModal").addEventListener("click", (event) => {
+    if (event.target === $("participantModal")) closeParticipantModal();
+  });
   $("adminParticipantList").addEventListener("click", (event) => handleParticipantAction(event).catch((err) => toast(err.message)));
   $("saveRankingButton").addEventListener("click", () => saveRankings().catch((err) => toast(err.message)));
   $("prevSlideButton").addEventListener("click", () => moveSlide(-1));

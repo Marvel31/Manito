@@ -82,7 +82,15 @@
           </section>
 
           <div class="admin-dashboard hidden" id="adminDashboard">
-            <nav class="admin-menu" aria-label="관리자 메뉴">
+            <div class="admin-mobile-bar">
+              <span id="adminCurrentMenu">참가자 명단</span>
+              <button class="menu-toggle" id="adminMenuButton" type="button" aria-expanded="false" aria-controls="adminMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+              </button>
+            </div>
+            <nav class="admin-menu" id="adminMenu" aria-label="관리자 메뉴">
               <button class="active" type="button" data-admin-tab="roster">참가자 명단</button>
               <button type="button" data-admin-tab="submissions">서브 미션</button>
               <button type="button" data-admin-tab="winners">우승자 선정</button>
@@ -93,25 +101,13 @@
               <div class="panel-header">
                 <div>
                   <p class="eyebrow">Basket Notes</p>
-                  <h2>참가자 등록</h2>
+                  <h2>참가자 명단</h2>
                 </div>
-                <button class="ghost" id="refreshAdminButton" type="button">새로고침</button>
+                <div class="header-actions">
+                  <button class="ghost" id="refreshAdminButton" type="button">새로고침</button>
+                  <button class="icon-button" id="addParticipantButton" type="button" aria-label="참가자 추가">+</button>
+                </div>
               </div>
-              <form id="participantForm" class="stack">
-                <input type="hidden" id="editParticipantId" />
-                <label>
-                  참가자 이름
-                  <input id="nameInput" type="text" placeholder="예: 김민준" />
-                </label>
-                <label>
-                  미션
-                  <input id="missionInput" type="text" placeholder="예: 마니또가 웃는 순간 찍기" />
-                </label>
-                <div class="button-row">
-                  <button class="primary" type="submit">저장</button>
-                  <button class="ghost" id="clearFormButton" type="button">취소</button>
-                </div>
-              </form>
               <div class="participant-list" id="adminParticipantList"></div>
             </section>
 
@@ -164,6 +160,29 @@
         </section>
       </main>
 
+      <div class="modal-backdrop hidden" id="participantModal" role="dialog" aria-modal="true" aria-labelledby="participantModalTitle">
+        <section class="modal-card">
+          <div class="panel-header">
+            <h2 id="participantModalTitle">참가자 추가</h2>
+            <button class="ghost" id="closeParticipantModalButton" type="button">닫기</button>
+          </div>
+          <form id="participantForm" class="stack">
+            <input type="hidden" id="editParticipantId" />
+            <label>
+              참가자 이름
+              <input id="nameInput" type="text" placeholder="예: 김민준" />
+            </label>
+            <label>
+              미션
+              <input id="missionInput" type="text" placeholder="예: 마니또가 웃는 순간 찍기" />
+            </label>
+            <div class="button-row">
+              <button class="primary" type="submit">저장</button>
+              <button class="ghost" id="clearFormButton" type="button">취소</button>
+            </div>
+          </form>
+        </section>
+      </div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
     </div>
     <script src="/app.js" type="module"></script>
