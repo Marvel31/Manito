@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>파파라치 마니또</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">MT Mission Game</p>
+          <h1>파파라치 마니또</h1>
+        </div>
+        <div class="mode-switch" role="tablist" aria-label="모드 선택">
+          <button class="active" id="participantMode" type="button">참가자</button>
+          <button id="adminMode" type="button">관리자</button>
+        </div>
+      </header>
+
+      <main>
+        <section id="participantView" class="view active">
+          <div class="participant-grid">
+            <section class="panel login-panel" id="loginPanel">
+              <h2>참가자 로그인</h2>
+              <label>
+                이름 선택
+                <select id="participantSelect"></select>
+              </label>
+              <label id="passwordLabel">
+                비밀번호
+                <input id="passwordInput" type="password" autocomplete="current-password" placeholder="비밀번호 입력" />
+              </label>
+              <p class="hint" id="firstLoginHint"></p>
+              <button class="primary" id="loginButton" type="button">입장하기</button>
+            </section>
+
+            <section class="panel mission-panel hidden" id="playerPanel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">오늘의 쪽지</p>
+                  <h2 id="playerName"></h2>
+                </div>
+                <button class="ghost" id="logoutButton" type="button">나가기</button>
+              </div>
+              <div class="mission-card">
+                <span>미션</span>
+                <strong id="missionText"></strong>
+              </div>
+              <form id="uploadForm" class="upload-box">
+                <label>
+                  파파라치 사진
+                  <input id="photoInput" type="file" name="photo" accept="image/*" />
+                </label>
+                <button class="primary" type="submit">사진 제출</button>
+                <p class="hint">사진은 1장만 저장됩니다. 다시 올리면 마지막 사진으로 바뀝니다.</p>
+              </form>
+              <div class="preview-wrap" id="playerPhotoWrap"></div>
+            </section>
+
+            <section class="panel guess-panel hidden" id="guessPanel">
+              <h2>내 마니또 맞추기</h2>
+              <p class="muted">나를 몰래 찍은 사람이 누구인지 예상해 보세요.</p>
+              <label>
+                예상 마니또
+                <select id="guessSelect"></select>
+              </label>
+              <button class="secondary" id="saveGuessButton" type="button">예상 저장</button>
+            </section>
+          </div>
+        </section>
+
+        <section id="adminView" class="view">
+          <section class="panel admin-login" id="adminLoginPanel">
+            <h2>관리자 입장</h2>
+            <label>
+              관리자 비밀번호
+              <input id="adminPasswordInput" type="password" autocomplete="current-password" placeholder="admin1234" />
+            </label>
+            <button class="primary" id="adminLoginButton" type="button">관리자 화면 열기</button>
+          </section>
+
+          <div class="admin-dashboard hidden" id="adminDashboard">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Basket Notes</p>
+                  <h2>참가자 등록</h2>
+                </div>
+                <button class="ghost" id="refreshAdminButton" type="button">새로고침</button>
+              </div>
+              <form id="participantForm" class="stack">
+                <input type="hidden" id="editParticipantId" />
+                <label>
+                  참가자 이름
+                  <input id="nameInput" type="text" placeholder="예: 김민준" />
+                </label>
+                <label>
+                  미션
+                  <input id="missionInput" type="text" placeholder="예: 마니또가 웃는 순간 찍기" />
+                </label>
+                <div class="button-row">
+                  <button class="primary" type="submit">저장</button>
+                  <button class="ghost" id="clearFormButton" type="button">취소</button>
+                </div>
+              </form>
+              <div class="participant-list" id="adminParticipantList"></div>
+            </section>
+
+            <section class="panel wide">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">Submissions</p>
+                  <h2>사진과 예상 마니또</h2>
+                </div>
+                <span class="count-badge" id="submitCount">0 / 0</span>
+              </div>
+              <div class="submission-grid" id="submissionGrid"></div>
+            </section>
+
+            <section class="panel wide">
+              <h2>1, 2, 3등 선정</h2>
+              <div class="ranking-grid">
+                <label>
+                  1등
+                  <select id="rankFirst"></select>
+                </label>
+                <label>
+                  2등
+                  <select id="rankSecond"></select>
+                </label>
+                <label>
+                  3등
+                  <select id="rankThird"></select>
+                </label>
+              </div>
+              <button class="primary" id="saveRankingButton" type="button">순위 저장</button>
+            </section>
+          </div>
+        </section>
+      </main>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
