@@ -265,7 +265,9 @@ function renderSlideshow() {
   $("prevSlideButton").disabled = slides.length <= 1;
   $("nextSlideButton").disabled = slides.length <= 1;
   $("autoSlideButton").disabled = slides.length <= 1;
+  $("fullscreenSlideButton").disabled = !document.fullscreenEnabled;
   $("autoSlideButton").textContent = state.slideTimer ? "자동 정지" : "자동 재생";
+  updateFullscreenButton();
 
   if (!slides.length) {
     stage.innerHTML = `<div class="empty-slide">아직 제출된 사진이 없습니다.</div>`;
@@ -310,6 +312,25 @@ function toggleAutoSlide() {
   if (slides.length <= 1) return;
   state.slideTimer = window.setInterval(() => moveSlide(1), 4500);
   $("autoSlideButton").textContent = "자동 정지";
+}
+
+function updateFullscreenButton() {
+  const isFullscreen = document.fullscreenElement === $("adminSlideshowSection");
+  $("fullscreenSlideButton").textContent = isFullscreen ? "전체 화면 종료" : "전체 화면";
+}
+
+async function toggleSlideshowFullscreen() {
+  const section = $("adminSlideshowSection");
+  if (!document.fullscreenEnabled) {
+    toast("이 브라우저에서는 전체 화면을 지원하지 않습니다.");
+    return;
+  }
+  if (document.fullscreenElement === section) {
+    await document.exitFullscreen();
+  } else {
+    await section.requestFullscreen();
+  }
+  updateFullscreenButton();
 }
 
 function openParticipantModal(participant = null) {
@@ -412,6 +433,8 @@ function wireEvents() {
   $("prevSlideButton").addEventListener("click", () => moveSlide(-1));
   $("nextSlideButton").addEventListener("click", () => moveSlide(1));
   $("autoSlideButton").addEventListener("click", toggleAutoSlide);
+  $("fullscreenSlideButton").addEventListener("click", () => toggleSlideshowFullscreen().catch((err) => toast(err.message)));
+  document.addEventListener("fullscreenchange", updateFullscreenButton);
 }
 
 async function restorePlayer() {

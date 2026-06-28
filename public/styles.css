@@ -435,6 +435,17 @@ input[type="file"] {
   color: white;
 }
 
+.slideshow-panel:fullscreen {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  border: 0;
+  border-radius: 0;
+  padding: 22px;
+  box-shadow: none;
+}
+
 .slideshow-panel .eyebrow,
 .slideshow-panel .hint,
 .slideshow-panel .muted {
@@ -450,6 +461,11 @@ input[type="file"] {
   overflow: hidden;
 }
 
+.slideshow-panel:fullscreen .slideshow-stage {
+  flex: 1;
+  min-height: 0;
+}
+
 .slide-card {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.6fr);
@@ -458,12 +474,20 @@ input[type="file"] {
   margin: 0;
 }
 
+.slideshow-panel:fullscreen .slide-card {
+  min-height: 100%;
+}
+
 .slide-card img {
   width: 100%;
   height: 100%;
   max-height: min(66vh, 680px);
   object-fit: contain;
   background: #050809;
+}
+
+.slideshow-panel:fullscreen .slide-card img {
+  max-height: none;
 }
 
 .slide-card figcaption {
@@ -498,6 +522,12 @@ input[type="file"] {
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-top: 14px;
+}
+
+.fullscreen-button {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.24);
 }
 
 .modal-backdrop {
