@@ -374,6 +374,27 @@ input[type="file"] {
   max-width: 480px;
 }
 
+.game-guide {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #faf8f2;
+  padding: 13px;
+}
+
+.game-guide strong {
+  color: var(--primary-dark);
+}
+
+.game-guide p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .participant-list {
   display: grid;
   gap: 8px;
