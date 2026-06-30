@@ -7,6 +7,7 @@ const state = {
   rankings: [],
   adminTab: "roster",
   adminMenuOpen: false,
+  pendingFirstLogin: null,
   slideIndex: 0,
   slideTimer: null
 };
@@ -90,16 +91,51 @@ async function loginParticipant() {
   const selected = state.participants.find((p) => p.id === participantId);
   if (!selected) return toast("참가자를 선택해 주세요.");
   const password = $("passwordInput").value;
-  const payload = selected.hasPassword
-    ? { participantId, password }
-    : { participantId, newPassword: password };
-  const data = await api("/api/login", { method: "POST", body: JSON.stringify(payload) });
+  if (!selected.hasPassword) {
+    if (password.length < 4) return toast("새 비밀번호는 4자 이상이어야 합니다.");
+    openIdentityConfirmModal(selected, password);
+    return;
+  }
+  await completeParticipantLogin({ participantId, password });
+}
+
+async function completeParticipantLogin(loginPayload) {
+  const data = await api("/api/login", { method: "POST", body: JSON.stringify(loginPayload) });
   state.player = data.participant;
   state.participants = data.participants.map((p) => ({ ...p, hasPassword: true }));
   localStorage.setItem("manitoParticipantId", state.player.id);
   $("passwordInput").value = "";
   renderPlayer();
   toast("입장했습니다.");
+}
+
+function openIdentityConfirmModal(participant, newPassword) {
+  state.pendingFirstLogin = {
+    participantId: participant.id,
+    newPassword
+  };
+  $("identityConfirmMessage").textContent = `선택한 참가자가 "${participant.name}" 본인이 맞나요?`;
+  $("identityConfirmModal").classList.remove("hidden");
+  $("confirmIdentityButton").focus();
+}
+
+function closeIdentityConfirmModal() {
+  state.pendingFirstLogin = null;
+  $("identityConfirmModal").classList.add("hidden");
+}
+
+function cancelIdentityConfirm() {
+  closeIdentityConfirmModal();
+  $("participantSelect").value = "";
+  $("passwordInput").value = "";
+  updateLoginHint();
+}
+
+async function confirmIdentityAndLogin() {
+  if (!state.pendingFirstLogin) return;
+  const payload = state.pendingFirstLogin;
+  closeIdentityConfirmModal();
+  await completeParticipantLogin(payload);
 }
 
 function renderPlayer() {
@@ -427,6 +463,11 @@ function wireEvents() {
   $("closeParticipantModalButton").addEventListener("click", closeParticipantModal);
   $("participantModal").addEventListener("click", (event) => {
     if (event.target === $("participantModal")) closeParticipantModal();
+  });
+  $("confirmIdentityButton").addEventListener("click", () => confirmIdentityAndLogin().catch((err) => toast(err.message)));
+  $("cancelIdentityButton").addEventListener("click", cancelIdentityConfirm);
+  $("identityConfirmModal").addEventListener("click", (event) => {
+    if (event.target === $("identityConfirmModal")) cancelIdentityConfirm();
   });
   $("adminParticipantList").addEventListener("click", (event) => handleParticipantAction(event).catch((err) => toast(err.message)));
   $("saveRankingButton").addEventListener("click", () => saveRankings().catch((err) => toast(err.message)));

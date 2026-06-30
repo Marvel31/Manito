@@ -185,6 +185,16 @@
           </form>
         </section>
       </div>
+      <div class="modal-backdrop hidden" id="identityConfirmModal" role="dialog" aria-modal="true" aria-labelledby="identityConfirmTitle">
+        <section class="modal-card">
+          <h2 id="identityConfirmTitle">본인 확인</h2>
+          <p class="confirm-message" id="identityConfirmMessage"></p>
+          <div class="button-row modal-actions">
+            <button class="primary" id="confirmIdentityButton" type="button">네, 맞아요</button>
+            <button class="ghost" id="cancelIdentityButton" type="button">다시 선택할게요</button>
+          </div>
+        </section>
+      </div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
     </div>
     <script src="/app.js" type="module"></script>
