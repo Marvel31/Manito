@@ -172,7 +172,6 @@ async function uploadPhoto(event) {
   const form = new FormData();
   form.append("participantId", state.player.id);
   form.append("photo", file);
-  form.append("message", $("messageInput").value);
   const data = await api("/api/upload", { method: "POST", body: form });
   state.player = data.participant;
   $("photoInput").value = "";
