@@ -202,14 +202,26 @@ label {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
-  min-height: 46px;
   border: 1px solid var(--line);
   border-radius: 7px;
   background: white;
   color: var(--ink);
+}
+
+input,
+select {
+  min-height: 46px;
   padding: 0 12px;
+}
+
+textarea {
+  min-height: 96px;
+  padding: 12px;
+  resize: vertical;
+  line-height: 1.5;
 }
 
 input[type="file"] {
@@ -335,6 +347,20 @@ input[type="file"] {
 
 .preview-wrap {
   margin-top: 16px;
+}
+
+.message-save-button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.message-preview {
+  margin: 10px 0 0;
+  border-left: 3px solid var(--primary);
+  padding-left: 10px;
+  color: var(--ink);
+  font-weight: 800;
+  line-height: 1.5;
 }
 
 .admin-login {
@@ -504,6 +530,14 @@ input[type="file"] {
   color: white;
   font-size: clamp(1.2rem, 3vw, 2.2rem);
   line-height: 1.35;
+}
+
+.slide-message {
+  margin: 2px 0;
+  color: #f6e7dc;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.45;
 }
 
 .slide-owner {

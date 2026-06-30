@@ -145,6 +145,7 @@ function renderPlayer() {
   $("guessPanel").classList.remove("hidden");
   $("playerName").textContent = state.player.name;
   $("missionText").textContent = state.player.mission;
+  $("messageInput").value = state.player.message || "";
   const others = state.participants.filter((p) => p.id !== state.player.id);
   $("guessSelect").innerHTML = optionList(others, state.player.guessId, "아직 모르겠어요");
   renderPlayerPhoto();
@@ -159,6 +160,7 @@ function renderPlayerPhoto() {
   wrap.innerHTML = `
     <img src="${state.player.photo.url}" alt="제출한 사진" />
     <p class="hint">제출 완료: ${new Date(state.player.photo.uploadedAt).toLocaleString("ko-KR")}</p>
+    ${state.player.message ? `<p class="message-preview">"${escapeHtml(state.player.message)}"</p>` : ""}
   `;
 }
 
@@ -170,11 +172,25 @@ async function uploadPhoto(event) {
   const form = new FormData();
   form.append("participantId", state.player.id);
   form.append("photo", file);
+  form.append("message", $("messageInput").value);
   const data = await api("/api/upload", { method: "POST", body: form });
   state.player = data.participant;
   $("photoInput").value = "";
+  $("messageInput").value = state.player.message || "";
   renderPlayerPhoto();
   toast("사진을 제출했습니다.");
+}
+
+async function saveMessage() {
+  if (!state.player) return;
+  const data = await api("/api/message", {
+    method: "POST",
+    body: JSON.stringify({ participantId: state.player.id, message: $("messageInput").value })
+  });
+  state.player = data.participant;
+  $("messageInput").value = state.player.message || "";
+  renderPlayerPhoto();
+  toast("한마디를 저장했습니다.");
 }
 
 async function saveGuess() {
@@ -288,6 +304,7 @@ function renderSubmissions() {
           <strong>${escapeHtml(p.name)}</strong>
           <span>자신의 예상 마니또: ${escapeHtml(guess)}</span>
           <span>미션: ${escapeHtml(p.mission)}</span>
+          <span>한마디: ${p.message ? escapeHtml(p.message) : "아직 없음"}</span>
         </div>
       </article>
     `;
@@ -313,12 +330,14 @@ function renderSlideshow() {
 
   const participant = slides[state.slideIndex];
   const guess = participant.guessId ? nameOf(participant.guessId) : "아직 없음";
+  const message = participant.message || "마니또에게 남긴 한마디가 아직 없습니다.";
   stage.innerHTML = `
     <figure class="slide-card">
       <img src="${participant.photo.url}" alt="${escapeHtml(participant.name)} 제출 사진" />
       <figcaption>
         <span class="slide-owner">${escapeHtml(participant.name)}</span>
         <strong>${escapeHtml(participant.mission)}</strong>
+        <p class="slide-message">"${escapeHtml(message)}"</p>
         <span>자신의 예상 마니또: ${escapeHtml(guess)}</span>
       </figcaption>
     </figure>
@@ -453,6 +472,7 @@ function wireEvents() {
   $("participantSelect").addEventListener("change", updateLoginHint);
   $("loginButton").addEventListener("click", () => loginParticipant().catch((err) => toast(err.message)));
   $("uploadForm").addEventListener("submit", (event) => uploadPhoto(event).catch((err) => toast(err.message)));
+  $("saveMessageButton").addEventListener("click", () => saveMessage().catch((err) => toast(err.message)));
   $("saveGuessButton").addEventListener("click", () => saveGuess().catch((err) => toast(err.message)));
   $("logoutButton").addEventListener("click", logoutParticipant);
   $("adminLoginButton").addEventListener("click", () => adminLogin().catch((err) => toast(err.message)));

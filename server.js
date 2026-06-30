@@ -81,6 +81,7 @@ function publicParticipant(participant, includeSecret = false) {
     mission: participant.mission,
     hasPassword: Boolean(participant.passwordHash),
     guessId: participant.guessId || "",
+    message: participant.message || "",
     photo: participant.photo || null,
     createdAt: participant.createdAt
   };
@@ -135,8 +136,18 @@ app.post("/api/guess", async (req, res) => {
   res.json({ participant: publicParticipant(participant) });
 });
 
+app.post("/api/message", async (req, res) => {
+  const { participantId, message } = req.body;
+  const db = await readDb();
+  const participant = db.participants.find((p) => p.id === participantId);
+  if (!participant) return res.status(404).json({ message: "참가자를 찾을 수 없습니다." });
+  participant.message = (message || "").trim().slice(0, 160);
+  await saveDb(db);
+  res.json({ participant: publicParticipant(participant) });
+});
+
 app.post("/api/upload", upload.single("photo"), async (req, res) => {
-  const { participantId } = req.body;
+  const { participantId, message } = req.body;
   const db = await readDb();
   const participant = db.participants.find((p) => p.id === participantId);
   if (!participant) return res.status(404).json({ message: "참가자를 찾을 수 없습니다." });
@@ -151,6 +162,7 @@ app.post("/api/upload", upload.single("photo"), async (req, res) => {
     originalName: req.file.originalname,
     uploadedAt: new Date().toISOString()
   };
+  participant.message = (message || participant.message || "").trim().slice(0, 160);
   await saveDb(db);
   res.json({ participant: publicParticipant(participant) });
 });
@@ -172,6 +184,7 @@ app.post("/api/admin/participants", requireAdmin, async (req, res) => {
     name: name.trim(),
     mission: mission?.trim() || "마니또가 눈치채지 못하게 자연스러운 사진 찍기",
     guessId: "",
+    message: "",
     passwordHash: "",
     photo: null,
     createdAt: new Date().toISOString()

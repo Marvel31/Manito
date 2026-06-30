@@ -60,9 +60,14 @@
                   파파라치 사진
                   <input id="photoInput" type="file" name="photo" accept="image/*" />
                 </label>
+                <label>
+                  마니또에게 한마디
+                  <textarea id="messageInput" maxlength="160" placeholder="사진과 함께 보여줄 한마디를 적어주세요."></textarea>
+                </label>
                 <button class="primary" type="submit">사진 제출</button>
                 <p class="hint">사진은 1장만 저장됩니다. 다시 올리면 마지막 사진으로 바뀝니다.</p>
               </form>
+              <button class="secondary message-save-button" id="saveMessageButton" type="button">한마디만 저장</button>
               <div class="preview-wrap" id="playerPhotoWrap"></div>
             </section>
 
